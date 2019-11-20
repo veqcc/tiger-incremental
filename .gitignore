@@ -1,4 +1,7 @@
 .cm
 run.out
 sources.x86-linux
+tiger.grm.desc
+tiger.grm.sig
+tiger.grm.sml
 tiger.lex.sml

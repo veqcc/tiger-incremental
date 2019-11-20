@@ -1,0 +1,26 @@
+
+%%
+
+%term
+    EOF
+  | INT of int
+
+%nonterm
+    program
+  | exp
+
+%pos int
+%verbose
+%start program
+%eop EOF
+%noshift EOF
+
+%name Tiger
+
+%%
+
+program:
+  exp ()
+
+exp:
+  INT ()
