@@ -1,4 +1,6 @@
 
+structure A = Absyn
+
 %%
 
 %term
@@ -6,8 +8,8 @@
   | INT of int
 
 %nonterm
-    program
-  | exp
+    program of A.exp
+  | exp of A.exp
 
 %pos int
 %verbose
@@ -19,8 +21,5 @@
 
 %%
 
-program:
-  exp ()
-
-exp:
-  INT ()
+program: exp (exp)
+exp: INT (A.IntExp INT)

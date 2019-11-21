@@ -7,7 +7,7 @@ head -1 tiger.grm.desc &&
     echo -- $tigerSource --
     cat $tigerSource
     echo --
-    sml @SMLload=sources.x86-linux $tigerSource
+    ./tigerc $tigerSource
     echo
   done
-) > run.out
+)

@@ -4,7 +4,11 @@ type svalue = Tokens.svalue
 type ('a, 'b) token = ('a, 'b) Tokens.token
 type lexresult = (svalue, pos) token
 
-fun eof() = Tokens.EOF(0,0)
+val lineNum = ErrorMsg.lineNum
+val linePos = ErrorMsg.linePos
+fun err(p1,p2) = ErrorMsg.error p1
+
+fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos, pos) end
 
 exception NotAnInt
 
@@ -20,3 +24,5 @@ digits = [0-9]+;
 %%
 
 {digits} => (Tokens.INT(getInt (Int.fromString yytext), yypos, yypos + size yytext));
+"\n"     => (lineNum := !lineNum + 1; linePos := yypos :: !linePos; continue());
+.        => (ErrorMsg.error yypos ("illegal character '" ^ yytext ^ "'"); continue());
