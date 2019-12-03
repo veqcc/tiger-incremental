@@ -12,6 +12,8 @@ struct
           | indent i = (say " "; indent(i - 1))
         fun opname A.PlusOp = "PlusOp"
           | opname A.MinusOp = "MinusOp"
+          | opname A.TimesOp = "TimesOp"
+          | opname A.DivideOp = "DivideOp"
 
         fun exp(A.IntExp i, d) =
               (indent d; say "IntExp("; say(Int.toString i); say ")")

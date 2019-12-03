@@ -17,8 +17,10 @@ struct
               sayln "  pop rdi";
               sayln "  pop rax";
               case oper of
-                T.PLUS => sayln "  add rax, rdi"
-              | T.MINUS => sayln "  sub rax, rdi";
+                T.PLUS  => sayln "  add rax, rdi"
+              | T.MINUS => sayln "  sub rax, rdi"
+              | T.MUL   => sayln "  imul rax, rdi"
+              | T.DIV   => (sayln "  cqo"; sayln "  idiv rdi");
               sayln "  push rax")
 
     in

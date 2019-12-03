@@ -12,6 +12,8 @@ struct
           | indent i = (say " "; indent(i - 1))
         fun binop T.PLUS = say "PLUS"
           | binop T.MINUS = say "MINUS"
+          | binop T.MUL = say "MUL"
+          | binop T.DIV = say "DIV"
 
         fun exp(T.CONST i, d) = (indent d; say "CONST "; say(Int.toString i))
           | exp(T.BINOP(oper, left, right), d) =

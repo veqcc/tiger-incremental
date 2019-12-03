@@ -8,6 +8,10 @@ structure A = Absyn
   | INT of int
   | PLUS
   | MINUS
+  | TIMES
+  | DIVIDE
+  | LPAREN
+  | RPAREN
 
 %nonterm
     program of A.exp
@@ -19,12 +23,16 @@ structure A = Absyn
 %eop EOF
 %noshift EOF
 %left PLUS MINUS
+%left TIMES DIVIDE
 
 %name Tiger
 
 %%
 
-program: exp        (exp)
-exp: INT            (A.IntExp INT)
-   | exp PLUS exp   (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
-   | exp MINUS exp  (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})
+program: exp            (exp)
+exp: INT                (A.IntExp INT)
+   | exp PLUS exp       (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
+   | exp MINUS exp      (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})
+   | exp TIMES exp      (A.OpExp {left = exp1, oper = A.TimesOp, right = exp2, pos = TIMESleft})
+   | exp DIVIDE exp     (A.OpExp {left = exp1, oper = A.DivideOp, right = exp2, pos = DIVIDEleft})
+   | LPAREN exp RPAREN  (exp)

@@ -1,12 +1,6 @@
-structure Tree :
-sig
-  datatype binop = PLUS | MINUS
-  datatype exp = CONST of int
-               | BINOP of binop * exp * exp
-end =
-
+structure Tree =
 struct
-  datatype binop = PLUS | MINUS
+  datatype binop = PLUS | MINUS | MUL | DIV
   datatype exp = CONST of int
                | BINOP of binop * exp * exp
 end

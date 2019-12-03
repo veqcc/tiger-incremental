@@ -11,7 +11,9 @@ struct
           val rightExp = transExp right
         in
           case oper of
-            Absyn.PlusOp  => Tree.BINOP (Tree.PLUS, leftExp, rightExp)
-          | Absyn.MinusOp => Tree.BINOP (Tree.MINUS, leftExp, rightExp)
+            Absyn.PlusOp   => Tree.BINOP (Tree.PLUS, leftExp, rightExp)
+          | Absyn.MinusOp  => Tree.BINOP (Tree.MINUS, leftExp, rightExp)
+          | Absyn.TimesOp  => Tree.BINOP (Tree.MUL, leftExp, rightExp)
+          | Absyn.DivideOp => Tree.BINOP (Tree.DIV, leftExp, rightExp)
   end
 end
