@@ -6,6 +6,8 @@ structure A = Absyn
 %term
     EOF
   | INT of int
+  | PLUS
+  | MINUS
 
 %nonterm
     program of A.exp
@@ -16,10 +18,13 @@ structure A = Absyn
 %start program
 %eop EOF
 %noshift EOF
+%left PLUS MINUS
 
 %name Tiger
 
 %%
 
-program: exp (exp)
-exp: INT (A.IntExp INT)
+program: exp        (exp)
+exp: INT            (A.IntExp INT)
+   | exp PLUS exp   (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
+   | exp MINUS exp  (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})

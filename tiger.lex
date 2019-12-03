@@ -23,6 +23,9 @@ digits = [0-9]+;
 
 %%
 
-{digits} => (Tokens.INT(getInt (Int.fromString yytext), yypos, yypos + size yytext));
-"\n"     => (lineNum := !lineNum + 1; linePos := yypos :: !linePos; continue());
-.        => (ErrorMsg.error yypos ("illegal character '" ^ yytext ^ "'"); continue());
+"+"          => (Tokens.PLUS (yypos, yypos + 1));
+"-"          => (Tokens.MINUS (yypos, yypos + 1));
+{digits}     => (Tokens.INT(getInt (Int.fromString yytext), yypos, yypos + size yytext));
+"\n"         => (lineNum := !lineNum + 1; linePos := yypos :: !linePos; continue());
+(" "|\t|\r)  => (continue());
+.            => (ErrorMsg.error yypos ("illegal character '" ^ yytext ^ "'"); continue());
