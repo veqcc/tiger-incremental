@@ -7,6 +7,8 @@ head -1 tiger.grm.desc &&
     echo -- $tigerSource --
     cat $tigerSource
     ./tigerc $tigerSource
-    echo
+    gcc -o tmp tmp.s
+    ./tmp
+    echo "=>" $? "\n"
   done
 )
