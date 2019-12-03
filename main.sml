@@ -8,7 +8,9 @@ struct
       print "--\n";
       PrintAbsyn.print(TextIO.stdOut, absyn);
       print "--\n";
-      PrintTree.print(TextIO.stdOut, tree)
+      PrintTree.print(TextIO.stdOut, tree);
+      print "--\n";
+      PrintAssem.print(TextIO.stdOut, tree)
   end
 
   fun main(cmd: string, args: string list): OS.Process.status = let in

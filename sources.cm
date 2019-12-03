@@ -3,6 +3,7 @@ Group is
 main.sml
 absyn.sml
 print_absyn.sml
+print_assem.sml
 print_tree.sml
 error.sml
 parse.sml
