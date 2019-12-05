@@ -11,4 +11,9 @@ struct
     | MinusOp
     | TimesOp
     | DivideOp
+    | EqOp
+    | LtOp
+    | LeOp
+    | GtOp
+    | GeOp
 end

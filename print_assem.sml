@@ -22,6 +22,18 @@ struct
               | T.MUL   => sayln "  imul rax, rdi"
               | T.DIV   => (sayln "  cqo"; sayln "  idiv rdi");
               sayln "  push rax")
+          | exp(T.RELOP(oper, left, right)) =
+              (exp(left);
+              exp(right);
+              sayln "  pop rdi";
+              sayln "  pop rax";
+              sayln "  cmp rax, rdi";
+              case oper of
+                T.EQ => sayln "  sete al"
+              | T.LT => sayln "  setl al"
+              | T.LE => sayln "  setle al";
+              sayln "  movzb rax, al";
+              sayln "  push rax")
 
     in
       sayln ".intel_syntax noprefix";

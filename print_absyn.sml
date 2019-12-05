@@ -14,6 +14,11 @@ struct
           | opname A.MinusOp = "MinusOp"
           | opname A.TimesOp = "TimesOp"
           | opname A.DivideOp = "DivideOp"
+          | opname A.EqOp = "EqOp"
+          | opname A.LtOp = "LtOp"
+          | opname A.LeOp = "LeOp"
+          | opname A.GtOp = "GtOp"
+          | opname A.GeOp = "GeOp"
 
         fun exp(A.IntExp i, d) =
               (indent d; say "IntExp("; say(Int.toString i); say ")")

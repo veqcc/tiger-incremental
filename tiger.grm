@@ -10,6 +10,11 @@ structure A = Absyn
   | MINUS
   | TIMES
   | DIVIDE
+  | EQ
+  | GT
+  | GE
+  | LT
+  | LE
   | LPAREN
   | RPAREN
 
@@ -22,6 +27,7 @@ structure A = Absyn
 %start program
 %eop EOF
 %noshift EOF
+%nonassoc EQ GT GE LT LE
 %left PLUS MINUS
 %left TIMES DIVIDE
 
@@ -36,4 +42,9 @@ exp: INT                (A.IntExp INT)
    | exp MINUS exp      (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})
    | exp TIMES exp      (A.OpExp {left = exp1, oper = A.TimesOp, right = exp2, pos = TIMESleft})
    | exp DIVIDE exp     (A.OpExp {left = exp1, oper = A.DivideOp, right = exp2, pos = DIVIDEleft})
+   | exp EQ exp         (A.OpExp {left = exp1, oper = A.EqOp, right = exp2, pos = EQleft})
+   | exp LT exp         (A.OpExp {left = exp1, oper = A.LtOp, right = exp2, pos = LTleft})
+   | exp LE exp         (A.OpExp {left = exp1, oper = A.LeOp, right = exp2, pos = LEleft})
+   | exp GT exp         (A.OpExp {left = exp1, oper = A.GtOp, right = exp2, pos = GTleft})
+   | exp GE exp         (A.OpExp {left = exp1, oper = A.GeOp, right = exp2, pos = GEleft})
    | LPAREN exp RPAREN  (exp)
