@@ -31,6 +31,7 @@ structure A = Absyn
 
 program: exp            (exp)
 exp: INT                (A.IntExp INT)
+   | MINUS exp          (A.OpExp {left = A.IntExp 0, oper = A.MinusOp, right = exp, pos = MINUSright})
    | exp PLUS exp       (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
    | exp MINUS exp      (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})
    | exp TIMES exp      (A.OpExp {left = exp1, oper = A.TimesOp, right = exp2, pos = TIMESleft})
