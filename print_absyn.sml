@@ -25,6 +25,14 @@ struct
           | exp(A.OpExp{left, oper, right, pos}, d) =
               (indent d; say "OpExp("; say(opname oper); sayln ",";
               exp(left, d + 1); sayln ","; exp(right, d + 1); say ")")
+          | exp(A.LetExp{vars, body, pos}, d) =
+              (indent d; sayln "LetExp(";
+              dec(vars, d + 1); sayln ",";
+              exp(body, d + 1); say ")")
+
+        and dec(A.VarDec{name, init, pos}, d) =
+              (indent d; say "VarDec("; say(Symbol.name name);
+              say ","; exp(init, d + 1); say ")")
 
     in
       exp(e0, 0);

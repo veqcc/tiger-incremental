@@ -8,6 +8,7 @@ print_tree.sml
 error.sml
 parse.sml
 semant.sml
+symbol.sml
 tree.sml
 tiger.lex
 tiger.grm
