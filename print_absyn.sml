@@ -34,7 +34,7 @@ struct
 
         and dec(A.VarDec{name, init, pos}, d) =
               (indent d; say "VarDec("; say(Symbol.name name);
-              say ","; exp(init, d + 1); say ")")
+              say ","; exp(init, 1); say ")")
 
         and var(A.SimpleVar(v, p), d) =
               (indent d; say "SimpleVar("; say(Symbol.name v); say ")")
