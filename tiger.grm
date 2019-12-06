@@ -48,7 +48,8 @@ structure A = Absyn
 
 program: exp                (exp)
 vardec: VAR ID ASSIGN exp   (A.VarDec {name = Symbol.symbol ID, init = exp, pos = VARright})
-exp: INT                    (A.IntExp INT)
+exp: ID                     (A.VarExp (A.SimpleVar (Symbol.symbol ID, IDleft)))
+   | INT                    (A.IntExp INT)
    | MINUS exp              (A.OpExp {left = A.IntExp 0, oper = A.MinusOp, right = exp, pos = MINUSright})
    | exp PLUS exp           (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
    | exp MINUS exp          (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})

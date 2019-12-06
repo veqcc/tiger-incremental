@@ -22,6 +22,8 @@ struct
 
         fun exp(A.IntExp i, d) =
               (indent d; say "IntExp("; say(Int.toString i); say ")")
+          | exp(A.VarExp v, d) =
+              (indent d; say "VarExp("; var(v, 0); say ")")
           | exp(A.OpExp{left, oper, right, pos}, d) =
               (indent d; say "OpExp("; say(opname oper); sayln ",";
               exp(left, d + 1); sayln ","; exp(right, d + 1); say ")")
@@ -33,6 +35,9 @@ struct
         and dec(A.VarDec{name, init, pos}, d) =
               (indent d; say "VarDec("; say(Symbol.name name);
               say ","; exp(init, d + 1); say ")")
+
+        and var(A.SimpleVar(v, p), d) =
+              (indent d; say "SimpleVar("; say(Symbol.name v); say ")")
 
     in
       exp(e0, 0);
