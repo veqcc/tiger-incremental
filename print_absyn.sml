@@ -27,17 +27,18 @@ struct
           | exp(A.OpExp{left, oper, right, pos}, d) =
               (indent d; say "OpExp("; say(opname oper); sayln ",";
               exp(left, d + 1); sayln ","; exp(right, d + 1); say ")")
-          | exp(A.LetExp{vars, body, pos}, d) =
+          | exp(A.LetExp{varDec, body, pos}, d) =
               (indent d; sayln "LetExp(";
-              dec(vars, d + 1); sayln ",";
+              dec(varDec, d + 1); sayln ",";
               exp(body, d + 1); say ")")
 
-        and dec(A.VarDec{name, init, pos}, d) =
-              (indent d; say "VarDec("; say(Symbol.name name);
+        and dec(A.VarDec{symbol, init, pos}, d) =
+              (indent d; say "VarDec("; say(Symbol.extractName symbol);
               say ","; exp(init, 1); say ")")
 
-        and var(A.SimpleVar(v, p), d) =
-              (indent d; say "SimpleVar("; say(Symbol.name v); say ")")
+        and var(A.SimpleVar(symbol, pos), d) =
+              (indent d; say "SimpleVar(";
+              say(Symbol.extractName symbol); say ")")
 
     in
       exp(e0, 0);

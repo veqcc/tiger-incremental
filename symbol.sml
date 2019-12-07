@@ -1,30 +1,30 @@
 structure Symbol :
 sig
   type symbol
-  val symbol : string -> symbol
-  val name : symbol -> string
+  val createSymbol : string -> symbol
+  val extractName : symbol -> string
 end =
 
 struct
   type symbol = string * int
   exception Symbol
-  val nextsym = ref 0
+  val nextSymbolIdx = ref 0
   structure H = HashTable
 
   val hashtable : (string, int) H.hash_table =
 		H.mkTable(HashString.hashString, op = ) (128, Symbol)
 
-  fun symbol name =
+  fun createSymbol name =
     case H.find hashtable name
-       of SOME i => (name, i)
+       of SOME idx => (name, idx)
         | NONE =>
           let
-            val i = !nextsym
+            val idx = !nextSymbolIdx
           in
-            nextsym := i + 1;
-            H.insert hashtable (name, i);
-            (name, i)
+            nextSymbolIdx := idx + 1;
+            H.insert hashtable (name, idx);
+            (name, idx)
           end
 
-  fun name(s, n) = s
+  fun extractName(name, idx) = name
 end

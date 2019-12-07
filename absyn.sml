@@ -1,9 +1,8 @@
 structure Absyn =
 struct
   type pos = int
-  type symbol = Symbol.symbol
 
-  datatype var = SimpleVar of symbol * pos
+  datatype var = SimpleVar of Symbol.symbol * pos
   datatype oper = PlusOp | MinusOp | TimesOp | DivideOp
                 | EqOp | LtOp | LeOp | GtOp | GeOp
 
@@ -11,7 +10,7 @@ struct
       IntExp of int
     | VarExp of var
     | OpExp of {left: exp, oper: oper, right: exp, pos: pos}
-    | LetExp of {vars: dec, body: exp, pos: pos}
+    | LetExp of {varDec: dec, body: exp, pos: pos}
 
-  and dec = VarDec of {name: symbol, init: exp, pos: pos}
+  and dec = VarDec of {symbol: Symbol.symbol, init: exp, pos: pos}
 end
