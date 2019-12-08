@@ -1,24 +1,62 @@
 structure Semant :
 sig
-  val transExp: Absyn.exp -> Tree.exp
+  val transProg: Absyn.exp -> Tree.exp
 end =
 
 struct
-  fun transExp(Absyn.IntExp i) = Tree.CONST i
-    | transExp(Absyn.OpExp {left, oper, right, pos}) =
+  type venv = Env.entry Symbol.table
+  val offset = ref 0
+
+  fun transExp venv =
+    let
+      fun trExp (Absyn.IntExp i) = Tree.CONST i
+        | trExp (Absyn.VarExp (Absyn.SimpleVar (symbol, pos))) =
+            (case Symbol.look (venv, symbol) of
+              NONE =>
+                (ErrorMsg.error pos ("undefined variable `" ^ Symbol.extractName symbol ^ "`");
+                Tree.MEM (Tree.CONST 0))
+              | SOME (Env.VarEntry access) =>
+                Tree.MEM (Tree.CONST access)
+            )
+        | trExp (Absyn.OpExp {left, oper, right, pos}) =
+            let
+              val leftExp = trExp left
+              val rightExp = trExp right
+            in
+              case oper of
+                Absyn.PlusOp   => Tree.BINOP (Tree.PLUS, leftExp, rightExp)
+              | Absyn.MinusOp  => Tree.BINOP (Tree.MINUS, leftExp, rightExp)
+              | Absyn.TimesOp  => Tree.BINOP (Tree.MUL, leftExp, rightExp)
+              | Absyn.DivideOp => Tree.BINOP (Tree.DIV, leftExp, rightExp)
+              | Absyn.EqOp     => Tree.RELOP (Tree.EQ, leftExp, rightExp)
+              | Absyn.LtOp     => Tree.RELOP (Tree.LT, leftExp, rightExp)
+              | Absyn.LeOp     => Tree.RELOP (Tree.LE, leftExp, rightExp)
+              | Absyn.GtOp     => Tree.RELOP (Tree.LT, rightExp, leftExp)
+              | Absyn.GeOp     => Tree.RELOP (Tree.LE, rightExp, leftExp)
+            end
+        | trExp (Absyn.LetExp {varDec, body, pos}) =
+            let
+              val result = transDec venv varDec
+            in
+              Tree.ESEQ (#exp result, transExp (#venv result) body)
+            end
+    in
+      trExp
+    end
+
+  and transDec venv =
+    let
+      fun trDec (Absyn.VarDec {symbol, init, pos}) =
         let
-          val leftExp = transExp left
-          val rightExp = transExp right
+          val exp' = transExp venv init
+          val _ = offset := !offset + 8;
+          val venv' = Symbol.enter(venv, symbol, Env.VarEntry (!offset))
         in
-          case oper of
-            Absyn.PlusOp   => Tree.BINOP (Tree.PLUS, leftExp, rightExp)
-          | Absyn.MinusOp  => Tree.BINOP (Tree.MINUS, leftExp, rightExp)
-          | Absyn.TimesOp  => Tree.BINOP (Tree.MUL, leftExp, rightExp)
-          | Absyn.DivideOp => Tree.BINOP (Tree.DIV, leftExp, rightExp)
-          | Absyn.EqOp     => Tree.RELOP (Tree.EQ, leftExp, rightExp)
-          | Absyn.LtOp     => Tree.RELOP (Tree.LT, leftExp, rightExp)
-          | Absyn.LeOp     => Tree.RELOP (Tree.LE, leftExp, rightExp)
-          | Absyn.GtOp     => Tree.RELOP (Tree.LT, rightExp, leftExp)
-          | Absyn.GeOp     => Tree.RELOP (Tree.LE, rightExp, leftExp)
-  end
+          {venv = venv', exp = Tree.MOVE(Tree.MEM(Tree.CONST (!offset)), exp')}
+        end
+      in
+        trDec
+    end
+
+  fun transProg exp = transExp Env.baseVenv exp
 end

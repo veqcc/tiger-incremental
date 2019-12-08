@@ -2,6 +2,7 @@ Group is
 
 main.sml
 absyn.sml
+env.sml
 print_absyn.sml
 print_assem.sml
 print_tree.sml
@@ -9,6 +10,7 @@ error.sml
 parse.sml
 semant.sml
 symbol.sml
+table.sml
 tree.sml
 tiger.lex
 tiger.grm

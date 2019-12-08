@@ -3,6 +3,11 @@ sig
   type symbol
   val createSymbol : string -> symbol
   val extractName : symbol -> string
+
+  type 'a table
+  val empty: 'a table
+  val enter: 'a table * symbol * 'a -> 'a table
+  val look : 'a table * symbol -> 'a option
 end =
 
 struct
@@ -27,4 +32,17 @@ struct
           end
 
   fun extractName(name, idx) = name
+
+  structure Table = IntMapTable(
+    type key = symbol
+  	fun getInt(name, num) = num
+    fun getKey num =
+      case List.find (fn (_, num') => num = num') (H.listItemsi hashtable) of
+        SOME symbol => symbol
+      | NONE => raise Fail "not found")
+
+  type 'a table = 'a Table.table
+  val empty = Table.empty
+  val enter = Table.enter
+  val look = Table.look
 end
