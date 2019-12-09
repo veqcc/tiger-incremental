@@ -10,7 +10,7 @@ struct
       IntExp of int
     | VarExp of var
     | OpExp of {left: exp, oper: oper, right: exp, pos: pos}
-    | LetExp of {varDec: dec, body: exp, pos: pos}
+    | LetExp of {decs: dec list, body: exp, pos: pos}
 
   and dec = VarDec of {symbol: Symbol.symbol, init: exp, pos: pos}
 end

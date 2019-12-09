@@ -27,7 +27,8 @@ structure A = Absyn
 %nonterm
     program of A.exp
   | exp of A.exp
-  | vardec of A.dec
+  | dec of A.dec
+  | decs of A.dec list
 
 %pos int
 %verbose
@@ -47,7 +48,9 @@ structure A = Absyn
 %%
 
 program: exp                (exp)
-vardec: VAR ID ASSIGN exp   (A.VarDec {symbol = Symbol.createSymbol ID, init = exp, pos = VARright})
+decs: dec                   ([dec])
+    | dec decs              (dec :: decs)
+dec: VAR ID ASSIGN exp      (A.VarDec {symbol = Symbol.createSymbol ID, init = exp, pos = VARright})
 exp: ID                     (A.VarExp (A.SimpleVar (Symbol.createSymbol ID, IDleft)))
    | INT                    (A.IntExp INT)
    | MINUS exp              (A.OpExp {left = A.IntExp 0, oper = A.MinusOp, right = exp, pos = MINUSright})
@@ -61,4 +64,4 @@ exp: ID                     (A.VarExp (A.SimpleVar (Symbol.createSymbol ID, IDle
    | exp GT exp             (A.OpExp {left = exp1, oper = A.GtOp, right = exp2, pos = GTleft})
    | exp GE exp             (A.OpExp {left = exp1, oper = A.GeOp, right = exp2, pos = GEleft})
    | LPAREN exp RPAREN      (exp)
-   | LET vardec IN exp END  (A.LetExp {varDec = vardec, body = exp, pos = LETright})
+   | LET decs IN exp END    (A.LetExp {decs = decs, body = exp, pos = LETright})

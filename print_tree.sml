@@ -23,6 +23,10 @@ struct
 			        exp(e2, d + 1); say ")")
           | stm(T.EXP e, d) =
               (indent d; sayln "EXP("; exp(e, d + 1); say ")")
+          | stm(T.SEQ (s1, s2), d) =
+              (indent d; sayln "SEQ(";
+              stm(s1, d + 1); sayln ",";
+              stm(s2, d + 1); say ")")
 
         and exp(T.CONST i, d) = (indent d; say "CONST "; say(Int.toString i))
           | exp(T.BINOP(oper, left, right), d) =

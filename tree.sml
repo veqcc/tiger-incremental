@@ -3,7 +3,8 @@ struct
   datatype binop = PLUS | MINUS | MUL | DIV
   datatype relop = EQ | LT | LE
 
-  datatype stm = EXP of exp
+  datatype stm = SEQ of stm * stm
+               | EXP of exp
                | MOVE of exp * exp
 
        and exp = CONST of int

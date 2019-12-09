@@ -19,6 +19,9 @@ struct
           | opname A.LeOp = "LeOp"
           | opname A.GtOp = "GtOp"
           | opname A.GeOp = "GeOp"
+        fun dolist d f [a] = (sayln ""; f(a, d + 1))
+          | dolist d f (a :: r) = (sayln ""; f(a, d + 1); say ","; dolist d f r)
+          | dolist d f nil = ()
 
         fun exp(A.IntExp i, d) =
               (indent d; say "IntExp("; say(Int.toString i); say ")")
@@ -27,9 +30,9 @@ struct
           | exp(A.OpExp{left, oper, right, pos}, d) =
               (indent d; say "OpExp("; say(opname oper); sayln ",";
               exp(left, d + 1); sayln ","; exp(right, d + 1); say ")")
-          | exp(A.LetExp{varDec, body, pos}, d) =
-              (indent d; sayln "LetExp(";
-              dec(varDec, d + 1); sayln ",";
+          | exp(A.LetExp{decs, body, pos}, d) =
+              (indent d; say "LetExp([";
+              dolist d dec decs; sayln "],";
               exp(body, d + 1); say ")")
 
         and dec(A.VarDec{symbol, init, pos}, d) =

@@ -10,7 +10,10 @@ struct
         fun sayln s = (say s; say "\n")
 
         (* stack machine *)
-        fun stm (T.EXP e) = exp(e)
+        fun stm (T.SEQ (s1, s2)) =
+            (stm(s1);
+            stm(s2))
+          | stm (T.EXP e) = exp(e)
           | stm (T.MOVE (T.MEM e1, e2)) =
               (exp(e1);
               exp(e2);
@@ -65,7 +68,7 @@ struct
       sayln "main:";
       sayln "  push rbp";
       sayln "  mov rbp, rsp";
-      sayln "  sub rsp, 16";
+      sayln "  sub rsp, 128";
 
       exp(s0);
       sayln "  pop rax";

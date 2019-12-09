@@ -34,11 +34,23 @@ struct
               | Absyn.GtOp     => Tree.RELOP (Tree.LT, rightExp, leftExp)
               | Absyn.GeOp     => Tree.RELOP (Tree.LE, rightExp, leftExp)
             end
-        | trExp (Absyn.LetExp {varDec, body, pos}) =
+        | trExp (Absyn.LetExp {decs, body, pos}) =
             let
-              val result = transDec venv varDec
+              fun reducer (dec, {venv, exps}) =
+                let
+                  val result = transDec venv dec
+                in
+                  {venv = #venv result, exps = exps @ #exps result}
+                end
+              val {venv = venv', exps} = List.foldl reducer {venv = venv, exps = []} decs
+              fun seq (exps: Tree.stm list) =
+                case exps of
+                  []      => Tree.EXP(Tree.CONST 0)
+                | x :: [] => x
+                | x :: xs => Tree.SEQ (x, seq xs)
+              val bodyExp = transExp venv' body
             in
-              Tree.ESEQ (#exp result, transExp (#venv result) body)
+              Tree.ESEQ (seq exps, bodyExp)
             end
     in
       trExp
@@ -52,7 +64,7 @@ struct
           val _ = offset := !offset + 8;
           val venv' = Symbol.enter(venv, symbol, Env.VarEntry (!offset))
         in
-          {venv = venv', exp = Tree.MOVE(Tree.MEM(Tree.CONST (!offset)), exp')}
+          {venv = venv', exps = [Tree.MOVE(Tree.MEM(Tree.CONST (!offset)), exp')]}
         end
       in
         trDec
