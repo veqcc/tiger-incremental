@@ -34,6 +34,14 @@ struct
               (indent d; say "LetExp([";
               dolist d dec decs; sayln "],";
               exp(body, d + 1); say ")")
+          | exp(A.IfExp{test, then', else', pos}, d) =
+              (indent d; sayln "IfExp(";
+              exp(test, d + 1); sayln ",";
+              exp(then', d + 1);
+              case else' of
+                NONE => ()
+              | SOME e => (sayln ","; exp(e, d + 1));
+              say ")")
 
         and dec(A.VarDec{symbol, init, pos}, d) =
               (indent d; say "VarDec("; say(Symbol.extractName symbol);
