@@ -24,6 +24,20 @@ struct
               sayln "  lea rax, [rdi]";
               sayln "  mov [rax], rdx";
               sayln "  push rax")
+          | stm (T.MOVE (T.TEMP t, e)) =
+              (exp(e);
+              sayln "  pop rax";
+              sayln ("  mov r1" ^ (Int.toString t) ^ ", rax"))
+          | stm (T.LABEL label) =
+              sayln ((Symbol.extractName label) ^ ":")
+          | stm (T.JUMP (T.NAME name, _)) =
+              sayln ("  jmp " ^ (Symbol.extractName name))
+          | stm (T.CJUMP (r, e1, e2, l1, l2)) =
+              (exp(T.RELOP(r, e1, e2));
+              sayln "  pop rax";
+              sayln "  cmp rax, 0";
+              sayln ("  je " ^ (Symbol.extractName l2));
+              sayln ("  jmp " ^ (Symbol.extractName l1)))
 
         and exp (T.CONST i) = (say "  push "; sayln(Int.toString i))
           | exp(T.BINOP(oper, left, right)) =
@@ -61,6 +75,8 @@ struct
               sayln "  lea rax, [rdi]";
               sayln "  mov rax, [rax]";
               sayln "  push rax")
+          | exp (T.TEMP t) =
+              sayln ("  push r1" ^ (Int.toString t))
 
     in
       sayln ".intel_syntax noprefix";
