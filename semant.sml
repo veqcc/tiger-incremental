@@ -7,6 +7,12 @@ struct
   type venv = Env.entry Symbol.table
   val offset = ref 0
 
+  fun seq (exps: Tree.stm list) =
+    case exps of
+      []      => Tree.EXP(Tree.CONST 0)
+    | x :: [] => x
+    | x :: xs => Tree.SEQ (x, seq xs)
+
   fun transExp venv =
     let
       fun trExp (Absyn.IntExp i) = Tree.CONST i
@@ -43,15 +49,53 @@ struct
                   {venv = #venv result, exps = exps @ #exps result}
                 end
               val {venv = venv', exps} = List.foldl reducer {venv = venv, exps = []} decs
-              fun seq (exps: Tree.stm list) =
-                case exps of
-                  []      => Tree.EXP(Tree.CONST 0)
-                | x :: [] => x
-                | x :: xs => Tree.SEQ (x, seq xs)
               val bodyExp = transExp venv' body
             in
               Tree.ESEQ (seq exps, bodyExp)
             end
+        | trExp (Absyn.IfExp {test, then', else', pos}) =
+            (case (trExp test, trExp then', Option.map trExp else') of
+              (testExp, thenExp, SOME elseExp) =>
+                let
+                  val t = Temp.newLabel ()
+                  val f = Temp.newLabel ()
+                  val j = Temp.newLabel ()
+                  val r = Temp.newTemp ()
+                in
+                  Tree.ESEQ (
+                    seq [
+                      Tree.CJUMP (Tree.EQ, Tree.CONST 0, testExp, f, t),
+                      Tree.LABEL t,
+                      Tree.MOVE (Tree.TEMP r, thenExp),
+                      Tree.JUMP (Tree.NAME j, [j]),
+                      Tree.LABEL f,
+                      Tree.MOVE (Tree.TEMP r, elseExp),
+                      Tree.LABEL j
+                    ],
+                    Tree.TEMP r
+                  )
+                end
+            | (testExp, thenExp, NONE) =>
+                let
+                  val t = Temp.newLabel ()
+                  val f = Temp.newLabel ()
+                  val j = Temp.newLabel ()
+                  val r = Temp.newTemp ()
+                in
+                  Tree.ESEQ (
+                    seq [
+                      Tree.CJUMP (Tree.EQ, Tree.CONST 0, testExp, f, t),
+                      Tree.LABEL t,
+                      Tree.MOVE (Tree.TEMP r, thenExp),
+                      Tree.JUMP (Tree.NAME j, [j]),
+                      Tree.LABEL f,
+                      Tree.MOVE (Tree.TEMP r, Tree.CONST 0),
+                      Tree.LABEL j
+                    ],
+                    Tree.TEMP r
+                  )
+                end
+              )
     in
       trExp
     end

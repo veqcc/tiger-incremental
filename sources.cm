@@ -11,6 +11,7 @@ parse.sml
 semant.sml
 symbol.sml
 table.sml
+temp.sml
 tree.sml
 tiger.lex
 tiger.grm

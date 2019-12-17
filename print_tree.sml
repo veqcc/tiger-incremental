@@ -27,6 +27,17 @@ struct
               (indent d; sayln "SEQ(";
               stm(s1, d + 1); sayln ",";
               stm(s2, d + 1); say ")")
+          | stm(T.LABEL label, d) =
+              (indent d; say "LABEL "; say (Symbol.extractName label))
+          | stm(T.JUMP (e, _), d) =
+              (indent d; sayln "JUMP("; exp(e, d + 1); say ")")
+          | stm(T.CJUMP(r, e1, e2, l1, l2), d) =
+              (indent d; say "CJUMP(";
+              relop r; sayln ",";
+              exp(e1, d + 1); sayln ",";
+              exp(e2, d + 1); sayln ",";
+              indent(d + 1); say(Symbol.extractName l1); say ",";
+              say (Symbol.extractName l2); say ")")
 
         and exp(T.CONST i, d) = (indent d; say "CONST "; say(Int.toString i))
           | exp(T.BINOP(oper, left, right), d) =
@@ -40,6 +51,10 @@ struct
               exp(e, d + 1); say ")")
           | exp(T.MEM(e), d) =
               (indent d; sayln "MEM("; exp(e, d + 1); say ")")
+          | exp(T.NAME label, d) =
+              (indent d; say "NAME "; say (Symbol.extractName label))
+          | exp(T.TEMP temp, d) =
+              (indent d; say "TEMP t"; say(Int.toString temp))
     in
       exp(s0, 0);
       sayln "";
