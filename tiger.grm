@@ -25,6 +25,9 @@ structure A = Absyn
   | IF
   | THEN
   | ELSE
+  | FOR
+  | TO
+  | DO
   | ID of string
 
 %nonterm
@@ -39,12 +42,13 @@ structure A = Absyn
 %eop EOF
 %noshift EOF
 
-%keyword LET VAR IN END IF THEN ELSE
+%keyword LET VAR IN END IF THEN ELSE FOR TO DO
 
 %nonassoc EQ GT GE LT LE
 
 %left THEN
 %left ELSE
+%left DO
 %left PLUS MINUS
 %left TIMES DIVIDE
 
@@ -52,23 +56,24 @@ structure A = Absyn
 
 %%
 
-program: exp                   (exp)
-decs: dec                      ([dec])
-    | dec decs                 (dec :: decs)
-dec: VAR ID ASSIGN exp         (A.VarDec {symbol = Symbol.createSymbol ID, init = exp, pos = VARright})
-exp: ID                        (A.VarExp (A.SimpleVar (Symbol.createSymbol ID, IDleft)))
-   | INT                       (A.IntExp INT)
-   | MINUS exp                 (A.OpExp {left = A.IntExp 0, oper = A.MinusOp, right = exp, pos = MINUSright})
-   | exp PLUS exp              (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
-   | exp MINUS exp             (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})
-   | exp TIMES exp             (A.OpExp {left = exp1, oper = A.TimesOp, right = exp2, pos = TIMESleft})
-   | exp DIVIDE exp            (A.OpExp {left = exp1, oper = A.DivideOp, right = exp2, pos = DIVIDEleft})
-   | exp EQ exp                (A.OpExp {left = exp1, oper = A.EqOp, right = exp2, pos = EQleft})
-   | exp LT exp                (A.OpExp {left = exp1, oper = A.LtOp, right = exp2, pos = LTleft})
-   | exp LE exp                (A.OpExp {left = exp1, oper = A.LeOp, right = exp2, pos = LEleft})
-   | exp GT exp                (A.OpExp {left = exp1, oper = A.GtOp, right = exp2, pos = GTleft})
-   | exp GE exp                (A.OpExp {left = exp1, oper = A.GeOp, right = exp2, pos = GEleft})
-   | LPAREN exp RPAREN         (exp)
-   | LET decs IN exp END       (A.LetExp {decs = decs, body = exp, pos = LETright})
-   | IF exp THEN exp ELSE exp  (A.IfExp {test = exp1, then' = exp2, else' = SOME exp3, pos = IFright})
-   | IF exp THEN exp           (A.IfExp {test = exp1, then' = exp2, else' = NONE, pos = IFright})
+program: exp                          (exp)
+decs: dec                             ([dec])
+    | dec decs                        (dec :: decs)
+dec: VAR ID ASSIGN exp                (A.VarDec {symbol = Symbol.createSymbol ID, init = exp, pos = VARright})
+exp: ID                               (A.VarExp (A.SimpleVar (Symbol.createSymbol ID, IDleft)))
+   | INT                              (A.IntExp INT)
+   | MINUS exp                        (A.OpExp {left = A.IntExp 0, oper = A.MinusOp, right = exp, pos = MINUSright})
+   | exp PLUS exp                     (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
+   | exp MINUS exp                    (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})
+   | exp TIMES exp                    (A.OpExp {left = exp1, oper = A.TimesOp, right = exp2, pos = TIMESleft})
+   | exp DIVIDE exp                   (A.OpExp {left = exp1, oper = A.DivideOp, right = exp2, pos = DIVIDEleft})
+   | exp EQ exp                       (A.OpExp {left = exp1, oper = A.EqOp, right = exp2, pos = EQleft})
+   | exp LT exp                       (A.OpExp {left = exp1, oper = A.LtOp, right = exp2, pos = LTleft})
+   | exp LE exp                       (A.OpExp {left = exp1, oper = A.LeOp, right = exp2, pos = LEleft})
+   | exp GT exp                       (A.OpExp {left = exp1, oper = A.GtOp, right = exp2, pos = GTleft})
+   | exp GE exp                       (A.OpExp {left = exp1, oper = A.GeOp, right = exp2, pos = GEleft})
+   | LPAREN exp RPAREN                (exp)
+   | LET decs IN exp END              (A.LetExp {decs = decs, body = exp, pos = LETright})
+   | IF exp THEN exp ELSE exp         (A.IfExp {test = exp1, then' = exp2, else' = SOME exp3, pos = IFright})
+   | IF exp THEN exp                  (A.IfExp {test = exp1, then' = exp2, else' = NONE, pos = IFright})
+   | FOR ID ASSIGN exp TO exp DO exp  (A.ForExp {var = Symbol.createSymbol ID, low = exp1, high = exp2, body = exp3, pos = FORright})

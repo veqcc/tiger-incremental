@@ -42,6 +42,12 @@ struct
                 NONE => ()
               | SOME e => (sayln ","; exp(e, d + 1));
               say ")")
+          | exp(A.ForExp{var = var', low, high, body, pos}, d) =
+              (indent d; sayln "ForExp(";
+              indent (d + 1); say(Symbol.extractName var'); sayln ",";
+              exp(low, d + 1); sayln ",";
+              exp(high, d + 1); sayln ",";
+              exp(body, d + 1); say ")")
 
         and dec(A.VarDec{symbol, init, pos}, d) =
               (indent d; say "VarDec("; say(Symbol.extractName symbol);
