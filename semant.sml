@@ -145,6 +145,7 @@ struct
         | trExp (Absyn.SeqExp exps) =
             (case exps of
               [] => Tree.CONST 0
+            | [(e, _)] => trExp e
             | (e, _) :: es => Tree.ESEQ (Tree.EXP(trExp e), trExp (Absyn.SeqExp es))
             )
         | trExp (Absyn.AssignExp {var, exp, pos}) =

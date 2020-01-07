@@ -56,6 +56,9 @@ struct
               (indent d; sayln "AssignExp(";
               var(var', d + 1); sayln ",";
               exp(exp', d + 1); say ")")
+          | exp(A.SeqExp lst, d) =
+              (indent d; say "SeqExp[";
+              dolist d exp (map #1 lst); say "]")
 
         and dec(A.VarDec{symbol, init, pos}, d) =
               (indent d; say "VarDec("; say(Symbol.extractName symbol);
