@@ -48,6 +48,10 @@ struct
               exp(low, d + 1); sayln ",";
               exp(high, d + 1); sayln ",";
               exp(body, d + 1); say ")")
+          | exp(A.WhileExp{test, body, pos}, d) =
+              (indent d; sayln "WhileExp(";
+              exp(test, d + 1); sayln ",";
+              exp(body, d + 1); say ")")
 
         and dec(A.VarDec{symbol, init, pos}, d) =
               (indent d; say "VarDec("; say(Symbol.extractName symbol);

@@ -13,6 +13,9 @@ struct
     | LetExp of {decs: dec list, body: exp, pos: pos}
     | IfExp of {test: exp, then': exp, else': exp option, pos: pos}
     | ForExp of {var: Symbol.symbol, low: exp, high: exp, body: exp, pos: pos}
+    | WhileExp of {test: exp, body: exp, pos: pos}
+    | SeqExp of (exp * pos) list
+    | AssignExp of {var: var, exp: exp, pos: pos}
 
   and dec = VarDec of {symbol: Symbol.symbol, init: exp, pos: pos}
 end

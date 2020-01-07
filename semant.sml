@@ -16,14 +16,7 @@ struct
   fun transExp venv =
     let
       fun trExp (Absyn.IntExp i) = Tree.CONST i
-        | trExp (Absyn.VarExp (Absyn.SimpleVar (symbol, pos))) =
-            (case Symbol.look (venv, symbol) of
-              NONE =>
-                (ErrorMsg.error pos ("undefined variable `" ^ Symbol.extractName symbol ^ "`");
-                Tree.MEM (Tree.CONST 0))
-              | SOME (Env.VarEntry access) =>
-                Tree.MEM (Tree.CONST access)
-            )
+        | trExp (Absyn.VarExp var) = trVar var
         | trExp (Absyn.OpExp {left, oper, right, pos}) =
             let
               val leftExp = trExp left
@@ -96,6 +89,77 @@ struct
                   )
                 end
               )
+        | trExp (Absyn.WhileExp {test, body, pos}) =
+            let
+              val testExp = trExp test
+              val bodyExp = trExp body
+              val s = Temp.newLabel ()
+              val b = Temp.newLabel ()
+              val e = Temp.newLabel ()
+            in
+              Tree.ESEQ (
+                seq [
+                  Tree.LABEL s,
+                  Tree.CJUMP (Tree.EQ, Tree.CONST 0, testExp, e, b),
+                  Tree.LABEL b,
+                  Tree.EXP bodyExp,
+                  Tree.JUMP (Tree.NAME s, [s]),
+                  Tree.LABEL e
+                ],
+                Tree.CONST 0
+              )
+            end
+        | trExp (Absyn.ForExp {var, low, high, body, pos}) =
+            let
+              val loopEnd = Symbol.createSymbol "_LOOP_END"
+              val decs = [
+                Absyn.VarDec {symbol = var, init = low, pos = pos},
+                Absyn.VarDec {symbol = loopEnd, init = high, pos = pos}
+              ]
+              val bodyExp =
+                Absyn.WhileExp {
+                  test = Absyn.OpExp {
+                    left = Absyn.VarExp (Absyn.SimpleVar (var, pos)),
+                    oper = Absyn.LeOp,
+                    right = Absyn.VarExp (Absyn.SimpleVar (loopEnd, pos)),
+                    pos = pos
+                  },
+                  body = Absyn.SeqExp [
+                    (body, pos),
+                    (Absyn.AssignExp {
+                      var = Absyn.SimpleVar (var, pos),
+                      exp = Absyn.OpExp {
+                        left = Absyn.VarExp (Absyn.SimpleVar (var, pos)),
+                        oper = Absyn.PlusOp,
+                        right = Absyn.IntExp 1,
+                        pos = pos
+                      },
+                      pos = pos
+                    }, pos)
+                  ],
+                  pos = pos
+                }
+            in
+              trExp (Absyn.LetExp {decs = decs, body = bodyExp, pos = pos})
+            end
+        | trExp (Absyn.SeqExp exps) =
+            (case exps of
+              [] => Tree.CONST 0
+            | (e, _) :: es => Tree.ESEQ (Tree.EXP(trExp e), trExp (Absyn.SeqExp es))
+            )
+        | trExp (Absyn.AssignExp {var, exp, pos}) =
+            Tree.ESEQ (
+              Tree.MOVE (trVar var, trExp exp),
+              Tree.CONST 0
+            )
+      and trVar (Absyn.SimpleVar (symbol, pos)) =
+            (case Symbol.look (venv, symbol) of
+              NONE =>
+              (ErrorMsg.error pos ("undefined variable `" ^ Symbol.extractName symbol ^ "`");
+              Tree.MEM (Tree.CONST 0))
+            | SOME (Env.VarEntry access) =>
+              Tree.MEM (Tree.CONST access)
+            )
     in
       trExp
     end
