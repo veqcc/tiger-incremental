@@ -59,10 +59,22 @@ struct
           | exp(A.SeqExp lst, d) =
               (indent d; say "SeqExp[";
               dolist d exp (map #1 lst); say "]")
+          | exp(A.CallExp{func, args, pos}, d) =
+              (indent d; say "CallExp("; say (Symbol.extractName func); say ",[";
+              dolist d exp args; say "])")
 
         and dec(A.VarDec{symbol, init, pos}, d) =
               (indent d; say "VarDec("; say(Symbol.extractName symbol);
               say ","; exp(init, 1); say ")")
+          | dec(A.FunDec{symbol, params, body, pos}, d) =
+              let
+                fun f ({symbol, pos}, d) =
+                  (indent d; say (Symbol.extractName symbol))
+              in
+                (indent d; say "FunDec([";
+                dolist d f params; sayln "],";
+                exp (body, d + 1); say ")")
+              end
 
         and var(A.SimpleVar(symbol, pos), d) =
               (indent d; say "SimpleVar(";

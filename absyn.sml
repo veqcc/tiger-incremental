@@ -16,6 +16,11 @@ struct
     | WhileExp of {test: exp, body: exp, pos: pos}
     | SeqExp of (exp * pos) list
     | AssignExp of {var: var, exp: exp, pos: pos}
+    | CallExp of {func: Symbol.symbol, args: exp list, pos: pos}
 
-  and dec = VarDec of {symbol: Symbol.symbol, init: exp, pos: pos}
+  and dec =
+      VarDec of {symbol: Symbol.symbol, init: exp, pos: pos}
+    | FunDec of {symbol: Symbol.symbol, params: param list, body: exp, pos: pos}
+
+  withtype param = {symbol: Symbol.symbol, pos: pos}
 end

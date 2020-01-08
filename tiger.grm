@@ -30,6 +30,8 @@ structure A = Absyn
   | DO
   | SEMICOLON
   | WHILE
+  | FUNCTION
+  | COMMA
   | ID of string
 
 %nonterm
@@ -37,7 +39,12 @@ structure A = Absyn
   | exp of A.exp
   | dec of A.dec
   | decs of A.dec list
+  | vardec of A.dec
+  | fundec of A.dec
+  | params of A.param list
+  | explist of A.exp list
   | lvalue of A.var
+  | empty
 
 %pos int
 %verbose
@@ -45,7 +52,7 @@ structure A = Absyn
 %eop EOF
 %noshift EOF
 
-%keyword LET VAR IN END IF THEN ELSE FOR TO DO WHILE
+%keyword LET VAR IN END IF THEN ELSE FOR TO DO WHILE FUNCTION
 
 %nonassoc EQ GT GE LT LE
 
@@ -62,9 +69,19 @@ structure A = Absyn
 %%
 
 program: exp                         (exp)
+empty:                               ()
 decs: dec                            ([dec])
   | dec decs                         (dec :: decs)
-dec: VAR ID ASSIGN exp               (A.VarDec {symbol = Symbol.createSymbol ID, init = exp, pos = VARright})
+dec: vardec                          (vardec)
+  | fundec                           (fundec)
+vardec: VAR ID ASSIGN exp            (A.VarDec {symbol = Symbol.createSymbol ID, init = exp, pos = VARright})
+fundec: FUNCTION ID LPAREN params RPAREN EQ exp  (A.FunDec {symbol = Symbol.createSymbol ID, params = params, body = exp, pos = LPARENleft})
+params: ID COMMA params              ({symbol = Symbol.createSymbol ID, pos = IDleft} :: params)
+  | ID                               ([{symbol = Symbol.createSymbol ID, pos = IDleft}])
+  | empty                            ([])
+explist: exp COMMA explist           (exp :: explist)
+  | exp                              ([exp])
+  | empty                            ([])
 exp: ID                              (A.VarExp (A.SimpleVar (Symbol.createSymbol ID, IDleft)))
   | INT                              (A.IntExp INT)
   | MINUS exp                        (A.OpExp {left = A.IntExp 0, oper = A.MinusOp, right = exp, pos = MINUSright})
@@ -85,6 +102,7 @@ exp: ID                              (A.VarExp (A.SimpleVar (Symbol.createSymbol
   | lvalue ASSIGN exp                (A.AssignExp {var = lvalue, exp = exp, pos = ASSIGNright})
   | LPAREN RPAREN                    (A.SeqExp [])
   | WHILE exp DO exp                 (A.WhileExp {test = exp1, body = exp2, pos = WHILEright})
+  | ID LPAREN explist RPAREN         (A.CallExp {func = Symbol.createSymbol ID, args = explist, pos = IDright})
   | exp SEMICOLON exp                (case exp2 of
                                         A.SeqExp [] => A.SeqExp ((exp1, exp1right) :: [(A.SeqExp [], exp2left)])
                                       | A.SeqExp exps => A.SeqExp ((exp1, exp1right) :: exps)

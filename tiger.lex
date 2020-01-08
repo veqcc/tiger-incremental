@@ -48,6 +48,8 @@ to           => (Tokens.TO (yypos, yypos + 2));
 do           => (Tokens.DO (yypos, yypos + 2));
 ";"          => (Tokens.SEMICOLON (yypos, yypos + 1));
 while        => (Tokens.WHILE (yypos, yypos + 5));
+function     => (Tokens.FUNCTION (yypos, yypos + 8));
+","	         => (Tokens.COMMA (yypos, yypos + 1));
 {digits}     => (Tokens.INT(getInt (Int.fromString yytext), yypos, yypos + size yytext));
 {id}         => (Tokens.ID (yytext, yypos, yypos + size yytext));
 "\n"         => (lineNum := !lineNum + 1; linePos := yypos :: !linePos; continue());
