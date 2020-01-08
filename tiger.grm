@@ -29,6 +29,7 @@ structure A = Absyn
   | TO
   | DO
   | SEMICOLON
+  | WHILE
   | ID of string
 
 %nonterm
@@ -44,7 +45,7 @@ structure A = Absyn
 %eop EOF
 %noshift EOF
 
-%keyword LET VAR IN END IF THEN ELSE FOR TO DO
+%keyword LET VAR IN END IF THEN ELSE FOR TO DO WHILE
 
 %nonassoc EQ GT GE LT LE
 
@@ -83,6 +84,7 @@ exp: ID                              (A.VarExp (A.SimpleVar (Symbol.createSymbol
   | FOR ID ASSIGN exp TO exp DO exp  (A.ForExp {var = Symbol.createSymbol ID, low = exp1, high = exp2, body = exp3, pos = FORright})
   | lvalue ASSIGN exp                (A.AssignExp {var = lvalue, exp = exp, pos = ASSIGNright})
   | LPAREN RPAREN                    (A.SeqExp [])
+  | WHILE exp DO exp                 (A.WhileExp {test = exp1, body = exp2, pos = WHILEright})
   | exp SEMICOLON exp                (case exp2 of
                                         A.SeqExp [] => A.SeqExp ((exp1, exp1right) :: [(A.SeqExp [], exp2left)])
                                       | A.SeqExp exps => A.SeqExp ((exp1, exp1right) :: exps)
